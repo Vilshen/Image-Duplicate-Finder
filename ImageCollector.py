@@ -3,7 +3,7 @@ from PIL import Image,UnidentifiedImageError
 import pandas as pd
 import numpy as np
 from PHash import PHash
-from multiprocessing import Pool
+from multiprocessing import Pool,freeze_support
 from functools import partial
 
 
@@ -20,16 +20,16 @@ def parallelize_on_rows(data, func, num_of_processes=8):
     return parallelize(data, partial(run_on_subset, func), num_of_processes)
 
 def callGrayscaleHash(row):
-    if row['gsHash'] is None:
+    if pd.isna(row['gsHash']):
         with Image.open(row['path']) as img:
-            return PHash.grayscaleHash(img)
+            return str(PHash.grayscaleHash(img))
     else:
         return row['gsHash']
     
 def callRGBHash(row):
-    if row['rgbHash'] is None:
+    if pd.isna(row['rgbHash']):
         with Image.open(row['path']) as img:
-            return PHash.RGBHash(img)
+            return str(PHash.RGBHash(img))
     else:
         return row['rgbHash']
 
@@ -51,6 +51,8 @@ class ImageCollector:
             else:
                 scannedImages['gsHash']=scannedImages.apply(callGrayscaleHash,axis=1)
         dirHash=hash(folder)
+        if not os.path.exists("precomputedDirectories"):
+            os.mkdir("precomputedDirectories")
         scannedImages.to_pickle(f"precomputedDirectories\\{dirHash}.pkl")
         
         return scannedImages
@@ -61,7 +63,7 @@ class ImageCollector:
         
         scannedImages=pd.DataFrame(scannedImages,columns=["path","gsHash","rgbHash"])
         dirHash=hash(folder)
-        if False and os.path.isfile(f"precomputedDirectories\\{dirHash}.pkl"):
+        if os.path.isfile(f"precomputedDirectories\\{dirHash}.pkl"):
             try:
                 oldDataFrame=pd.read_pickle(f"precomputedDirectories\\{dirHash}.pkl")
                 scannedImages=scannedImages.fillna(oldDataFrame)
@@ -91,8 +93,9 @@ class ImageCollector:
             files.extend(f)
         return subfolders,files
     
-if __name__ == "__main__":    
-    ImageCollector.getImages(r"D:\1\stuff")
+if __name__ == "__main__":
+    freeze_support()    
+    pass
     
     
 

@@ -45,12 +45,16 @@ class PHash:
                 for j in range(n):
                     cosMap[i,j]=np.cos((2*i+1)*j*PHash.PI/(2*n))
             try:
+                if not os.path.exists("precomputedArrays"):
+                    os.mkdir("precomputedArrays")
                 np.save(f"precomputedArrays/cosMap{cropSize}.npy",cosMap)
             except OSError:
                 pass
             return cosMap
         
         try:
+            if not os.path.exists("precomputedArrays"):
+                os.mkdir("precomputedArrays")
             cosMap=np.load(f"precomputedArrays/cosMap{cropSize}.npy")
         except ValueError:
             os.remove(f"precomputedArrays/cosMap{cropSize}.npy")
@@ -79,10 +83,4 @@ class PHash:
         return dct
                         
 if __name__=="__main__":
-    from PIL import Image
-    testImg=Image.open(r"D:\Downloads\FGO_Ending_Final.png")
-    testImg.show()
-    grayHash=PHash.grayscaleHash(testImg)
-    rgbHash=PHash.RGBHash(testImg)
-    print(grayHash)
-    print(rgbHash)
+    pass
