@@ -5,7 +5,10 @@ import numpy as np
 from PHash import PHash
 from multiprocessing import Pool,freeze_support
 from functools import partial
+from xxhash import xxh32
 
+def xhash(data):
+    return xxh32(data).intdigest()
 
 def parallelize(data, func, num_of_processes=8): #tnx https://stackoverflow.com/questions/26784164/pandas-multiprocessing-apply
     data_split = np.array_split(data, num_of_processes)
@@ -15,7 +18,9 @@ def parallelize(data, func, num_of_processes=8): #tnx https://stackoverflow.com/
     pool.join()
     return data
 def run_on_subset(func, data_subset):
+        
     return data_subset.apply(func, axis=1)
+
 def parallelize_on_rows(data, func, num_of_processes=8):
     return parallelize(data, partial(run_on_subset, func), num_of_processes)
 
@@ -27,7 +32,7 @@ def callGrayscaleHash(row):
         return row['gsHash']
     
 def callRGBHash(row):
-    if pd.isna(row['rgbHash']):
+    if pd.isna(row['rgbHash']): 
         with Image.open(row['path']) as img:
             return str(PHash.RGBHash(img))
     else:
@@ -50,7 +55,8 @@ class ImageCollector:
                 scannedImages['gsHash']=parallelize_on_rows(scannedImages, callGrayscaleHash)
             else:
                 scannedImages['gsHash']=scannedImages.apply(callGrayscaleHash,axis=1)
-        dirHash=hash(folder)
+
+        dirHash=xhash(folder)
         if not os.path.exists("precomputedDirectories"):
             os.mkdir("precomputedDirectories")
         scannedImages.to_pickle(f"precomputedDirectories\\{dirHash}.pkl")
@@ -62,7 +68,7 @@ class ImageCollector:
         _,scannedImages=ImageCollector.__getPaths(folder)
         
         scannedImages=pd.DataFrame(scannedImages,columns=["path","gsHash","rgbHash"])
-        dirHash=hash(folder)
+        dirHash=xhash(folder)
         if os.path.isfile(f"precomputedDirectories\\{dirHash}.pkl"):
             try:
                 oldDataFrame=pd.read_pickle(f"precomputedDirectories\\{dirHash}.pkl")

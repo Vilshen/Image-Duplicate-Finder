@@ -63,28 +63,18 @@ class Clustering:
     def __nearestNeighbour(self,idx):
         dists=[(self.__hammingDistance(self.hashes[i],self.hashes[idx]),i) for i in range(self.imgCount)]
         
-        
-        #small threshold option
-        if True:
-            for dist in dists:
-                if dist[0]<self.threshold:
-                    self.__union(dist[1],idx)
-        #closest neighbour, large threshold option
-        if False:
-            dists.sort()
-            for dist in dists:
-                if dist[1]!=idx:
-                    if dist[0]<self.threshold:
-                        self.__union(dist[1],idx)
-                    break
-            
-        
+        for dist in dists:
+            if dist[0]<self.threshold:
+                self.__union(dist[1],idx)
+
 
 if __name__=="__main__":
     import json
     from ImageCollector import ImageCollector
-    images=ImageCollector.getImages(r"D:\MEGA\tpm\Stuff")
-    clusterGenerator=Clustering(images)
-    clusters=clusterGenerator.getClusters()
-    json.dump(clusters,open("mega_dump.json",'w'))
+    images=ImageCollector.getImages(r"D:\MEGA\tpm\Stuff",True)
+   
+    #clusterGenerator=Clustering(images)
+    #clusters=clusterGenerator.getClusters()
+    #clusters={k: v for k,v in clusters.items() if len(v)>1}
+    #json.dump(clusters,open("mega_dump.json",'w'))
     pass
