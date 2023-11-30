@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QWidget,QHBoxLayout,QVBoxLayout,QLabel,QPushButton,QFileDialog,QCheckBox 
+from PyQt5.QtWidgets import QWidget,QSpinBox,QGridLayout,QVBoxLayout,QLabel,QPushButton,QFileDialog,QCheckBox 
 import os
 
 class ControlPanel(QWidget):
@@ -21,7 +21,7 @@ class ControlPanel(QWidget):
         dirSelectButton.clicked.connect(self.setDir)
         
         innerWidget=QWidget()
-        innerLayout=QHBoxLayout(innerWidget)
+        innerLayout=QGridLayout(innerWidget)
         
         self.currDirlabel=QLabel()
         self.currDirlabel.setText("No directory selected")
@@ -39,8 +39,17 @@ class ControlPanel(QWidget):
         self.threadingCheckbox.stateChanged.connect(self.threadingUpdate)
         self.threadingCheckbox.setToolTip("Massively speeds up preprocessing. Has no effect for already preprocessed directories")
         
-        innerLayout.addWidget(self.RGBcheckbox)
-        innerLayout.addWidget(self.threadingCheckbox)
+        self.spinBox=QSpinBox(self)
+        self.spinBox.setMinimum(0)
+        self.spinBox.setValue(10)
+        
+        spinBoxExplanation=QLabel()
+        spinBoxExplanation.setText("Maximum difference of duplicate")
+        
+        innerLayout.addWidget(self.RGBcheckbox,0,0)
+        innerLayout.addWidget(self.threadingCheckbox,0,1)
+        innerLayout.addWidget(self.spinBox,1,0)
+        innerLayout.addWidget(spinBoxExplanation,1,1)
         
         
         
@@ -60,11 +69,10 @@ class ControlPanel(QWidget):
             
         
         
-        
     def RGBupdate(self):
         self.parent.parent.RGBmode=self.RGBcheckbox.isChecked()
     def threadingUpdate(self):
         self.parent.parent.Threading=self.threadingCheckbox.isChecked()
         
     def start(self):
-        self.parent.parent.start(self.searchDir)
+        self.parent.parent.start(self.searchDir,self.spinBox.value())

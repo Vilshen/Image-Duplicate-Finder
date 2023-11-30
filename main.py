@@ -37,9 +37,9 @@ class MainWindow(QMainWindow):
         self.layout.removeItem(self.layout.itemAt(1))
         self.layout.addWidget(ImageContainer(self,imgList))
         
-    def start(self,searchDir):
+    def start(self,searchDir,threshold):
         images=ImageCollector.getImages(searchDir,self.RGBmode,self.Threading)
-        clusterGenerator=Clustering(images,threshold=10)
+        clusterGenerator=Clustering(images,self.RGBmode,threshold)
         clusters=clusterGenerator.getClusters()
         self.clusters={v[0]: v for k,v in clusters.items() if len(v)>1}
         clusters=self.clusters

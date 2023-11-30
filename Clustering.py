@@ -1,5 +1,4 @@
-import pandas as pd
-from PIL import Image
+
 
 class Clustering:
     def __init__(self,images,RGBmode=False,threshold=4):
@@ -52,8 +51,8 @@ class Clustering:
         return           
     
     def __hammingDistance(self,hash1:int,hash2:int):
-        assert len(bin(hash1))==len(bin(hash2)),"Hash lengths not equal"
-        return (hash1^hash2).bit_length()
+        #assert len(bin(hash1))==len(bin(hash2)),"Hash lengths not equal"
+        return (hash1^hash2).bit_count()
     
     def __cluster(self):
         for i in range(self.imgCount):
@@ -69,6 +68,8 @@ class Clustering:
 
 if __name__=="__main__":
     import json
+    import pandas as pd
+    from PIL import Image
     from ImageCollector import ImageCollector
     images=ImageCollector.getImages(r"D:\Downloads",True)
     clusterGenerator=Clustering(images)

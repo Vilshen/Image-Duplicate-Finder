@@ -13,6 +13,7 @@ def xhash(data):
     return xxh32(data).intdigest()
 
 def parallelize(data, func, num_of_processes=8): #tnx https://stackoverflow.com/questions/26784164/pandas-multiprocessing-apply
+    num_of_processes=min(np.shape(data)[0],num_of_processes)    
     data_split = np.array_split(data, num_of_processes)
     pool = Pool(num_of_processes)
     data = pd.concat(pool.map(func, data_split))
@@ -28,15 +29,21 @@ def parallelize_on_rows(data, func, num_of_processes=8):
 
 def callGrayscaleHash(row):
     if pd.isna(row['gsHash']):
-        with Image.open(row['path']) as img:
-            return str(PHash.grayscaleHash(img))
+        try:
+            with Image.open(row['path']) as img:
+                return str(PHash.grayscaleHash(img))
+        except FileNotFoundError:
+            return 0|1<<PHash.HASH_LENGTH
     else:
         return row['gsHash']
     
 def callRGBHash(row):
     if pd.isna(row['rgbHash']): 
-        with Image.open(row['path']) as img:
-            return str(PHash.RGBHash(img))
+        try:
+            with Image.open(row['path']) as img:
+                return str(PHash.RGBHash(img))
+        except FileNotFoundError:
+            return 0|1<<PHash.HASH_LENGTH*3
     else:
         return row['rgbHash']
 
@@ -70,11 +77,13 @@ class ImageCollector:
         _,scannedImages=ImageCollector.__getPaths(folder)
         
         scannedImages=pd.DataFrame(scannedImages,columns=["path","gsHash","rgbHash"])
+        scannedImages.index=scannedImages['path']
         dirHash=xhash(folder)
         if os.path.isfile(f"precomputedDirectories\\{dirHash}.pkl"):
             try:
                 oldDataFrame=pd.read_pickle(f"precomputedDirectories\\{dirHash}.pkl")
                 scannedImages=scannedImages.fillna(oldDataFrame)
+                
             except:
                 pass
         return scannedImages

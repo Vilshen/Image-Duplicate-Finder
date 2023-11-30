@@ -6,10 +6,6 @@ class ImageLabel(QtWidgets.QWidget):
         super().__init__(parent)
         self._image = None
         
-        clicked = QtCore.pyqtSignal()
-        def mousePressEvent(self, QMouseEvent):
-            self.clicked.emit()
-            QtWidgets.QLabel.mousePressEvent(self, QMouseEvent)
 
     def setImage(self, image):
         self._image = image
