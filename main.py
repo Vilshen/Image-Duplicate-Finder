@@ -1,7 +1,11 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget,QHBoxLayout
+from PyQt5.QtGui import QStandardItem
 
 from ImageContainer import ImageContainer
+from Sidebar import Sidebar
+from ImageCollector import ImageCollector
+from Clustering import Clustering
 
 class MainWindow(QMainWindow):
 
@@ -12,8 +16,9 @@ class MainWindow(QMainWindow):
 
         self.layout = QHBoxLayout()
         
-        imgDirs=["D:\Downloads\справка_page-0001.jpg","D:\Downloads\img5.jpg","D:\Downloads\FGO_Ending_Final.png"]
-        self.layout.addWidget(ImageContainer(self,imgDirs))
+        self.sb=Sidebar(self)
+        self.layout.addWidget(self.sb)
+        self.layout.addWidget(ImageContainer(self))
         
         widget = QWidget()
         widget.setLayout(self.layout)
@@ -21,22 +26,32 @@ class MainWindow(QMainWindow):
         
         self.setCentralWidget(widget)
         
+        self.RGBmode=False
+        self.Threading=False
         
+        self.clusters=dict()
     
-    
-       #https://stackoverflow.com/questions/46024724/pyqt-how-to-create-a-scrollable-window
-       #https://doc.qt.io/qtforpython-5/PySide2/QtWidgets/QListView.html
-       #https://stackoverflow.com/questions/56894741/adding-icons-to-items-of-qlistview
+      
+    def switchImages(self,imgKey):
+        imgList=self.clusters[imgKey]
+        self.layout.removeItem(self.layout.itemAt(1))
+        self.layout.addWidget(ImageContainer(self,imgList))
         
-    #.close() on the ImageContainer to reload it
-    #def clicked(self,_):
-    #    self.layout.itemAt(0).widget().close()
-    #    imgDirs=[r"D:\MEGA\tpm\1596772630815.jpg"]
-    #    self.layout.addWidget(ImageContainer(self,imgDirs))
-
-    #with open("mega_dump.json") as theDict:
-    #    import json
-    #    self.clusters=json.loads(theDict.read())
+    def start(self,searchDir):
+        images=ImageCollector.getImages(searchDir,self.RGBmode,self.Threading)
+        clusterGenerator=Clustering(images,threshold=10)
+        clusters=clusterGenerator.getClusters()
+        self.clusters={v[0]: v for k,v in clusters.items() if len(v)>1}
+        clusters=self.clusters
+        
+        clusterList=self.sb.clusList.model
+        clusterList.clear()
+        
+        for key in self.clusters.keys():
+            item=QStandardItem(key)
+            clusterList.appendRow(item)
+        
+        
 if __name__ == '__main__':   
     app = QApplication(sys.argv)
     window = MainWindow()

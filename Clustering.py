@@ -2,16 +2,16 @@ import pandas as pd
 from PIL import Image
 
 class Clustering:
-    def __init__(self,images,mode="gs",threshold=4):
+    def __init__(self,images,RGBmode=False,threshold=4):
         self.imgCount=len(images.index)
         self.images=images['path'].to_list()
 
-        assert (mode=="gs" or mode=="rgb")
-        if mode=="gs":
-            self.hashes=images['gsHash'].to_list()
+
+        if RGBmode:
+            self.hashes=images['rgbHash'].to_list()
             self.hashes=list(map(int, self.hashes))
         else:
-            self.hashes=images['rgbHash'].to_list()
+            self.hashes=images['gsHash'].to_list()
             self.hashes=list(map(int, self.hashes))
 
         self.unionFind=[i for i in range(self.imgCount)]
@@ -52,7 +52,6 @@ class Clustering:
         return           
     
     def __hammingDistance(self,hash1:int,hash2:int):
-        pass
         assert len(bin(hash1))==len(bin(hash2)),"Hash lengths not equal"
         return (hash1^hash2).bit_length()
     
@@ -62,7 +61,7 @@ class Clustering:
     
     def __nearestNeighbour(self,idx):
         dists=[(self.__hammingDistance(self.hashes[i],self.hashes[idx]),i) for i in range(self.imgCount)]
-        
+
         for dist in dists:
             if dist[0]<self.threshold:
                 self.__union(dist[1],idx)
@@ -71,10 +70,9 @@ class Clustering:
 if __name__=="__main__":
     import json
     from ImageCollector import ImageCollector
-    images=ImageCollector.getImages(r"D:\MEGA\tpm\Stuff",True)
-   
-    #clusterGenerator=Clustering(images)
-    #clusters=clusterGenerator.getClusters()
-    #clusters={k: v for k,v in clusters.items() if len(v)>1}
+    images=ImageCollector.getImages(r"D:\Downloads",True)
+    clusterGenerator=Clustering(images)
+    clusters=clusterGenerator.getClusters()
+    clusters={k: v for k,v in clusters.items() if len(v)>1}
     #json.dump(clusters,open("mega_dump.json",'w'))
     pass

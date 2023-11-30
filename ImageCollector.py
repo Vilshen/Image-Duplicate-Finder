@@ -1,11 +1,13 @@
 import os
-from PIL import Image,UnidentifiedImageError
+from PIL import Image,ImageFile,UnidentifiedImageError
 import pandas as pd
 import numpy as np
 from PHash import PHash
 from multiprocessing import Pool,freeze_support
 from functools import partial
 from xxhash import xxh32
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 def xhash(data):
     return xxh32(data).intdigest()
@@ -101,7 +103,6 @@ class ImageCollector:
     
 if __name__ == "__main__":
     freeze_support()    
-    pass
     
     
 

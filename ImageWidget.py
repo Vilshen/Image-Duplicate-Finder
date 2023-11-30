@@ -1,8 +1,7 @@
 from PyQt5.QtWidgets import QWidget,QVBoxLayout,QLabel,QSizePolicy
-from PyQt5.QtGui import QPixmap,QImage
+from PyQt5.QtGui import QImage
 from PyQt5.QtCore import Qt
 from ImageLabel import ImageLabel
-import sys
 import os
 
 class ImageWidget(QWidget):

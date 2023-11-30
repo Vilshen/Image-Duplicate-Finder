@@ -1,5 +1,4 @@
 from PyQt5.QtWidgets import QWidget,QScrollArea,QLayout,QHBoxLayout
-from PyQt5.QtCore import Qt
 
 from ImageWidget import ImageWidget
 
@@ -17,7 +16,5 @@ class ImageContainer(QScrollArea):
         
         self.setWidget(self.widget)
         self.setWidgetResizable(True)
-        
-        #self.setLayout(layout)
         
         self.show()
