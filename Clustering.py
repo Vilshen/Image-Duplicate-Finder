@@ -76,4 +76,3 @@ if __name__=="__main__":
     clusters=clusterGenerator.getClusters()
     clusters={k: v for k,v in clusters.items() if len(v)>1}
     #json.dump(clusters,open("mega_dump.json",'w'))
-    pass

@@ -6,6 +6,8 @@ from ImageContainer import ImageContainer
 from Sidebar import Sidebar
 from ImageCollector import ImageCollector
 from Clustering import Clustering
+import multiprocessing
+
 
 class MainWindow(QMainWindow):
 
@@ -53,6 +55,7 @@ class MainWindow(QMainWindow):
         
         
 if __name__ == '__main__':   
+    multiprocessing.freeze_support()
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
