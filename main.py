@@ -36,6 +36,7 @@ class MainWindow(QMainWindow):
       
     def switchImages(self,imgKey):
         imgList=self.clusters[imgKey]
+        self.layout.itemAt(1).widget().deleteLater()
         self.layout.removeItem(self.layout.itemAt(1))
         self.layout.addWidget(ImageContainer(self,imgList))
         
