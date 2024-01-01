@@ -50,6 +50,9 @@ class ImageWidget(QWidget):
     
     
     def clicked(self,_):
-        os.startfile(self.path)
+        try:
+            os.startfile(self.path)
+        except:
+            pass
         
         
